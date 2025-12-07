@@ -9,17 +9,17 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        Window.WindowOptions  varijablab = new Window.WindowOptions();
-        varijablab.title = "bla screen";
-        varijablab.h = 1000;
-        varijablab.w = 1000;
+        Window.WindowOptions  windowoptions= new Window.WindowOptions();
+        windowoptions.title = "bla screen";
+        windowoptions.h = 1000;
+        windowoptions.w = 1000;
 
-        List<Screen<?>> varijablac = new ArrayList<>();
-        String varijablad = "bla";
+        List<Screen<?>> screenlist = new ArrayList<>();
+        String defoultscreen = "bla";
 
-        varijablac.add(new BlaScreen());
+        screenlist.add(new BlaScreen());
 
-        Window<?> window = new Window<>(varijablab, varijablac, varijablad);
+        Window<?> window = new Window<>(windowoptions, screenlist, defoultscreen);
 
         window.run();
     }

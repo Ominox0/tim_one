@@ -7,9 +7,9 @@ import io.github.libsdl4j.api.render.SDL_Renderer;
 import static io.github.libsdl4j.api.render.SdlRender.*;
 
 public class Rect extends Element {
-    private int x, y, w, h;
-    private byte r, g, b, a;
-    private boolean filled;
+    public int x, y, w, h;
+    public byte r, g, b, a;
+    public boolean filled;
 
     public Rect(int x, int y, int w, int h, byte r, byte g, byte b, byte a, boolean filled) {
         this.x = x;

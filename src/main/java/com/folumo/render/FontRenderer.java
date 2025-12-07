@@ -1,12 +1,9 @@
 package com.folumo.render;
 
 import com.sun.jna.Memory;
-import io.github.libsdl4j.api.render.SDL_Renderer;
-import io.github.libsdl4j.api.render.SDL_Texture;
 import io.github.libsdl4j.api.surface.SDL_Surface;
 import io.github.libsdl4j.api.pixels.SDL_PixelFormatEnum;
 import io.github.libsdl4j.api.surface.SdlSurface;
-import io.github.libsdl4j.api.render.SdlRender;
 import io.github.libsdl4j.api.error.SdlError;
 
 import java.awt.*;
@@ -33,28 +30,31 @@ public class FontRenderer {
     public SDL_Surface renderText(String text, Color color) {
         if (text == null || text.isEmpty()) return null;
 
-        // Use AWT to render the text into a BufferedImage
-        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = img.createGraphics();
-        g2d.setFont(font);
-        FontMetrics fm = g2d.getFontMetrics();
+        // --- Measure text size ---
+        BufferedImage tmpImg = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gtmp = tmpImg.createGraphics();
+        gtmp.setFont(font);
+        FontMetrics fm = gtmp.getFontMetrics();
         int width = fm.stringWidth(text);
         int height = fm.getHeight();
-        g2d.dispose();
+        int ascent = fm.getAscent();
+        gtmp.dispose();
 
-        img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        g2d = img.createGraphics();
+        // --- Draw actual image ---
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = img.createGraphics();
         g2d.setFont(font);
         g2d.setColor(color);
-        g2d.drawString(text, 0, fm.getAscent());
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        g2d.drawString(text, 0, ascent);
         g2d.dispose();
 
-        // Convert BufferedImage → SDL_Surface → SDL_Texture
+        // Convert JPEG/ARGB → raw pixel memory for SDL
         int[] pixels = img.getRGB(0, 0, width, height, null, 0, width);
 
         Memory nativeMem = new Memory((long) width * height * 4);
 
-        // Copy the int[] pixels into native memory
         for (int i = 0; i < pixels.length; i++) {
             nativeMem.setInt((long) i * 4, pixels[i]);
         }

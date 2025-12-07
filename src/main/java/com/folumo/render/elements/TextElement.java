@@ -9,19 +9,24 @@ import io.github.libsdl4j.api.render.SDL_Texture;
 import io.github.libsdl4j.api.surface.SDL_Surface;
 import io.github.libsdl4j.api.pixels.SDL_Color;
 
-import java.awt.*;
+import java.awt.Color;
 
+import static io.github.libsdl4j.api.blendmode.SDL_BlendMode.SDL_BLENDMODE_BLEND;
 import static io.github.libsdl4j.api.render.SdlRender.*;
 import static io.github.libsdl4j.api.surface.SdlSurface.*;
 
 public class TextElement extends Element {
+
     private String text;
     private int x, y;
     private byte r, g, b, a;
     private FontRenderer font;
+
     private SDL_Texture texture;
 
-    public TextElement(SDL_Renderer renderer, FontRenderer font, String text, int x, int y, byte r, byte g, byte b, byte a) {
+    public TextElement(SDL_Renderer renderer, FontRenderer font, String text,
+                       int x, int y, byte r, byte g, byte b, byte a) {
+
         this.font = font;
         this.text = text;
         this.x = x;
@@ -31,36 +36,73 @@ public class TextElement extends Element {
         this.b = b;
         this.a = a;
 
-
         updateTexture(renderer);
     }
 
     private void updateTexture(SDL_Renderer renderer) {
+        if (texture != null) {
+            SDL_DestroyTexture(texture);
+            texture = null;
+        }
 
-        SDL_Surface surface = font.renderText(text, new Color(r, g, b, a));
+        Color col = new Color(
+                Byte.toUnsignedInt(r),
+                Byte.toUnsignedInt(g),
+                Byte.toUnsignedInt(b),
+                Byte.toUnsignedInt(a)
+        );
+
+        SDL_Surface surface = font.renderText(text, col);
+
+        if (surface == null) {
+            System.err.println("Failed to render text surface for: " + text);
+            return;
+        }
+
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
+
+        if (texture == null) {
+            System.err.println("Failed to create texture from text surface.");
+        }
+
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     }
 
     @Override
     public void render(SDL_Renderer renderer) {
+        if (texture == null)
+            return;
+
         SDL_Rect dst = new SDL_Rect();
         dst.x = x;
         dst.y = y;
-        dst.w = 0;
-        dst.h = 0;
 
-        SDL_QueryTexture(texture, null, null, new IntByReference(dst.w), new IntByReference(dst.h));
+        // get width / height from texture
+        IntByReference w = new IntByReference();
+        IntByReference h = new IntByReference();
+
+        SDL_QueryTexture(texture, null, null, w, h);
+
+        dst.w = w.getValue();
+        dst.h = h.getValue();
+
         SDL_RenderCopy(renderer, texture, null, dst);
     }
 
     @Override
-    public boolean doesAcceptEvents() { return false; }
+    public boolean doesAcceptEvents() {
+        return false;
+    }
 
     @Override
-    public void event(SDL_Event event) {}
+    public void event(SDL_Event event) {
+    }
 
     public void destroy() {
-        if (texture != null) SDL_DestroyTexture(texture);
+        if (texture != null) {
+            SDL_DestroyTexture(texture);
+            texture = null;
+        }
     }
 }

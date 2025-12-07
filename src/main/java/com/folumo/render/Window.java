@@ -24,7 +24,7 @@ import static io.github.libsdl4j.api.video.SdlVideoConst.SDL_WINDOWPOS_CENTERED;
 
 public class Window <T extends Screen<?>> {
     protected SDL_Window window;
-    protected SDL_Renderer renderer;
+    public SDL_Renderer renderer;
     protected SDL_Event evt;
     protected boolean running;
     public Window.WindowOptions options;
