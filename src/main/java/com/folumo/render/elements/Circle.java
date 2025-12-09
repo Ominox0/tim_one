@@ -1,29 +1,29 @@
 package com.folumo.render.elements;
 
+import com.folumo.render.Utility;
 import io.github.libsdl4j.api.event.SDL_Event;
 import io.github.libsdl4j.api.render.SDL_Renderer;
+
+import java.awt.*;
 
 import static io.github.libsdl4j.api.render.SdlRender.*;
 
 public class Circle extends Element {
     private int cx, cy, radius;
-    private byte r, g, b, a;
+    private Color color;
     private boolean filled;
 
-    public Circle(int cx, int cy, int radius, byte r, byte g, byte b, byte a, boolean filled) {
+    public Circle(int cx, int cy, int radius, Color color, boolean filled) {
         this.cx = cx;
         this.cy = cy;
         this.radius = radius;
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
+        this.color = color;
         this.filled = filled;
     }
 
     @Override
     public void render(SDL_Renderer renderer) {
-        SDL_SetRenderDrawColor(renderer, r, g, b, a);
+        Utility.setRenderColor(renderer, color);
 
         int x = radius;
         int y = 0;

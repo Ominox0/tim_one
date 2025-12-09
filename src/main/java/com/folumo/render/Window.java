@@ -6,6 +6,7 @@ import io.github.libsdl4j.api.video.SDL_Window;
 import io.github.libsdl4j.api.video.SDL_WindowFlags;
 import org.intellij.lang.annotations.MagicConstant;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +62,15 @@ public class Window <T extends Screen<?>> {
 
     }
 
-    public void run(){
+    public void run() {
+        long lastTime = System.currentTimeMillis();
+        final long targetFrameTime = 1000L / options.fps;
+
         while (running) {
+            long now = System.currentTimeMillis();
+            double dt = (now - lastTime) / 1000.0;
+            lastTime = now;
+
             while (SDL_PollEvent(evt) != 0) {
                 if (evt.type == SDL_QUIT) {
                     running = false;
@@ -70,13 +78,19 @@ public class Window <T extends Screen<?>> {
                     getScreen().event(evt);
                 }
             }
-            SDL_SetRenderDrawColor(renderer, (byte) 0, (byte) 0, (byte) 0, (byte) 255);
+
+            Utility.setRenderColor(renderer, Color.BLACK);
             SDL_RenderClear(renderer);
 
-            getScreen().render(renderer);
+            Screen<?> screen = getScreen();
+            screen.tick(dt);
+            screen.render(renderer, dt);
 
             SDL_RenderPresent(renderer);
 
+            try {
+                Thread.sleep(targetFrameTime - (System.currentTimeMillis() - lastTime));
+            } catch (InterruptedException ignored) {}
         }
 
         SDL_Quit();

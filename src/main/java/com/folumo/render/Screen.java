@@ -19,7 +19,7 @@ public abstract class Screen <E extends Element> {
         }
     }
 
-    public void render(SDL_Renderer renderer){
+    public void render(SDL_Renderer renderer, double dt){
         for (E element : elements) {
             element.render(renderer);
         }
@@ -28,4 +28,6 @@ public abstract class Screen <E extends Element> {
     public abstract String getName();
 
     public abstract void init(Window<?> window);
+
+    public abstract void tick(double dt);
 }

@@ -1,13 +1,13 @@
 package com.folumo.screens;
 
-import com.folumo.render.FontRenderer;
 import com.folumo.render.Screen;
 import com.folumo.render.Window;
 import com.folumo.render.elements.*;
 import io.github.libsdl4j.api.event.SDL_Event;
 import io.github.libsdl4j.api.event.SDL_EventType;
-import io.github.libsdl4j.api.render.SDL_Renderer;
 import io.github.libsdl4j.api.scancode.SDL_Scancode;
+
+import java.awt.*;
 
 
 public class BlaScreen extends Screen {
@@ -22,36 +22,27 @@ public class BlaScreen extends Screen {
     @Override
     public void init(Window window) {
         this.elements.add(
-                new Rect(0, 0, window.options.w, window.options.h, (byte) 20, (byte) 20, (byte) 20, (byte) 255, true)
+                new Rect(0, 0, window.options.w, window.options.h, new Color(20, 20, 20), true)
         );
-
-        FontRenderer font = new FontRenderer(null, 36);
 
         this.elements.add(
-                new TextElement(window.renderer, font, "example", 0, 0, (byte) 20, (byte) 20, (byte) 20, (byte) 255)
+                new TextElement(window.renderer, new Font("Arial", Font.BOLD, 48), "example", 0, 0, Color.BLUE)
         );
 
-        player = new Rect(50,50, 50,100, (byte) 0, (byte) 255, (byte)255, (byte) 255 , true );
+        player = new Rect(50,50, 50,100, new Color(0, 255, 255) , true );
 
         this.elements.add(
                 player
         );
 
-        floor = new Rect(0, window.options.h, window.options.w,1,(byte)0, (byte)0,(byte)255,(byte)255,true);
+        floor = new Rect(0, window.options.h, window.options.w,1, new Color(0, 0, 255),true);
         this.elements.add(
                 floor
         );
     }
 
-
-    // 0 - 255
-    // 0 - 1
-    // #000000 - #ffffff
-
-    private void tick(){
-
-
-    }
+    @Override
+    public void tick(double dt){}
 
     @Override
     public void event(SDL_Event evt) {
@@ -66,19 +57,5 @@ public class BlaScreen extends Screen {
             }
 
         }
-    }
-
-    @Override
-    public void render(SDL_Renderer renderer) {
-        super.render(renderer);
-
-        this.tick();
-    }
-
-    public boolean checkCollision(int x1, int x2, int y1, int y2, int w1, int w2, int h1, int h2){
-        return (x1 < x2 + w2 &&
-        x1 + w1 > x2 &&
-        y1 < y2 + h2 &&
-        y1 + h1 > y2);
     }
 }
